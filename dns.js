@@ -1,11 +1,9 @@
 var PORT = 53;
 var HOST = '0.0.0.0';
-//var DNS = ['114.114.114.114'];
 var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var config = require('./config');
-var dns = require('native-dns');
 var server = dgram.createSocket('udp4');
 var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
@@ -44,6 +42,7 @@ server.on('message', function (messageReq, remoteReq) {
                             if (err) throw err;
                             console.log('Message send to ' + remoteReq.address + ':' + remoteReq.port);
                             console.log('-------------------------------------------');
+
                         });
                     }
                 });

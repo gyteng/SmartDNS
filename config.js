@@ -1,4 +1,4 @@
-fakeIpList = [
+exports.fakeIpList = [
     '128.121.126.139',
     '159.106.121.75',
     '169.132.13.103',
@@ -39,4 +39,3 @@ fakeIpList = [
     '93.46.8.89'
 ];
 
-exports.fakeIpList = fakeIpList;
