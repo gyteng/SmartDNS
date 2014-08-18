@@ -5,6 +5,7 @@ var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var config = require('./config');
+var dns = require('native-dns');
 var server = dgram.createSocket('udp4');
 var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
@@ -35,7 +36,7 @@ server.on('message', function (messageReq, remoteReq) {
                     bu.printBuffer(messageRes);
                     //var fakeIp = getFakeIp(messageRes);
                     var ip = getIp(messageRes);
-                    if (isFakeIp(ip[0], fakeIpList)) {
+                    if (isFakeIp(ip, fakeIpList)) {
                         console.log('Fake ip');
                         console.log('-------------------------------------------');
                     } else {
@@ -68,20 +69,12 @@ function getDomain(buffer) {
     return domain;
 }
 
-function getFakeIp(buffer) {
-    offset = buffer.length - 4;
-    var ipAddress = '';
-    ipAddress += buffer[offset] + '.' + buffer[offset+1] + '.' + buffer[offset+2] + '.' + buffer[offset+3];
-    console.log('ip: ' + ipAddress);
-    return ipAddress;
-}
-
 function isFakeIp(ip, list) {
-    if(list.length == 0) {
-        return false;
+    if(ip.length == 0) {
+        return true;
     }
     for(var i in list) {
-        if(ip == list[i]) {
+        if(ip[0] == list[i]) {
             return true;
         }
     }
@@ -95,18 +88,20 @@ function getIp(buffer) {
     while(buffer[offset] != 0) {
         offset += (buffer[offset] + 1);
     }
- /*   if(buffer[offset + 5] != 192) {
+    if(offset + 5 >= buffer.length) {
+        return ipList;
+    }
+    if(buffer[offset + 5] != 192) {
         offset += 5;
         while(buffer[offset] != 0) {
             offset += (buffer[offset] + 1);
         }
         offset -= 6;
     }
-*/    offset += 17;
+    offset += 17;
     while(offset < buffer.length) {
         ipAddress = '';
         ipAddress += buffer[offset] + '.' + buffer[offset+1] + '.' + buffer[offset+2] + '.' + buffer[offset+3];
-    //    console.log(ipAddress);
         ipList.push(ipAddress);
         offset += 16;
     }
