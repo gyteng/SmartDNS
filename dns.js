@@ -4,18 +4,26 @@ var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var config = require('./config');
+var logger = require('./LogUtils');
 var server = dgram.createSocket('udp4');
 var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
 
 server.on('listening', function () {
     var address = server.address();
-    console.log('-------------------------------------------');
-    console.log('DNS Server listening on ' + address.address + ":" + address.port);
-    console.log('-------------------------------------------');
+    logger = logger.bufferInit();
+    logger.log('-------------------------------------------');
+    logger.log('DNS Server listening on ' + address.address + ":" + address.port);
+    logger.log('-------------------------------------------');
+    logger.print();
+//    console.log('-------------------------------------------');
+//    console.log('DNS Server listening on ' + address.address + ":" + address.port);
+//    console.log('-------------------------------------------');
 });
 
+
 server.on('message', function (messageReq, remoteReq) {
+    logger = logger.bufferInit();
     console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
     console.log('Length: ' + messageReq.length);
     bu.printBuffer(messageReq);
