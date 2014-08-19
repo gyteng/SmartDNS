@@ -1,5 +1,4 @@
 exports.printBuffer = function (buffer) {
-    var print = '';
     var length = buffer.length;
     var buffer0 = '';
     var buffer1 = '';
@@ -11,11 +10,9 @@ exports.printBuffer = function (buffer) {
             for(var j = 0; j < (9 - (i % 10)); j++) {
                 buffer0 += '   ';
             }
-            //print += buffer0 + '   ' + buffer1 + '\n';
             console.log(buffer0 + '   ' + buffer1);
             buffer0 = '';
             buffer1 = '';
         }
     }
-    return print;
 }

@@ -23,7 +23,6 @@ server.on('listening', function () {
 
 
 server.on('message', function (messageReq, remoteReq) {
-    logger = logger.bufferInit();
     console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
     console.log('Length: ' + messageReq.length);
     bu.printBuffer(messageReq);
