@@ -10,14 +10,9 @@ var fakeIpList = config.fakeIpList;
 
 server.on('listening', function () {
     var address = server.address();
-    logger = logger.bufferInit();
-    logger.log('-------------------------------------------');
-    logger.log('DNS Server listening on ' + address.address + ":" + address.port);
-    logger.log('-------------------------------------------');
-    logger.print();
-//    console.log('-------------------------------------------');
-//    console.log('DNS Server listening on ' + address.address + ":" + address.port);
-//    console.log('-------------------------------------------');
+    console.log('-------------------------------------------');
+    console.log('DNS Server listening on ' + address.address + ":" + address.port);
+    console.log('-------------------------------------------');
 });
 
 
