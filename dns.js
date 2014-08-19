@@ -4,7 +4,6 @@ var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var config = require('./config');
-var logger = require('./LogUtils');
 var server = dgram.createSocket('udp4');
 var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
