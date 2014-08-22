@@ -3,6 +3,7 @@ var HOST = '0.0.0.0';
 var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
+var packet = require('native-dns-packet');
 var config = require('./config');
 var server = dgram.createSocket('udp4');
 var client = dgram.createSocket('udp4');
@@ -55,7 +56,11 @@ server.on('message', function (messageReq, remoteReq) {
 
 
 function getDomain(buffer) {
-    var domain = '';
+    var question = packet.parse(buffer).question;
+    var domain = question.pop().name
+    console.log('Domain: ' + domain);
+    return domain;
+/*    var domain = '';
     var offset = 12;
     while(buffer[offset] != 0) {
         for(var i = (offset + 1); i <= (offset + buffer[offset]); i++) {
@@ -67,6 +72,7 @@ function getDomain(buffer) {
     domain = domain.substring(0, domain.length - 1);
     console.log('Domain: ' + domain);
     return domain;
+    */
 }
 
 function isFakeIp(ip, list) {
@@ -82,6 +88,16 @@ function isFakeIp(ip, list) {
 }
 
 function getIp(buffer) {
+    var ipList  = [];
+    var answer = packet.parse(buffer).answer;
+    console.log('IP:');
+    for (i in answer) {
+        console.log(answer[i].address);
+        ipList.push(answer[i].address);
+    }
+    return ipList;
+
+    /*
     var ipList = [];
     var ipAddress = '';
     var offset = 12;
@@ -107,6 +123,8 @@ function getIp(buffer) {
     }
     console.log(ipList);
     return ipList;
+    */
+
 }
 
 server.bind(PORT, HOST);
