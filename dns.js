@@ -92,7 +92,7 @@ function getIp(buffer) {
     var answer = packet.parse(buffer).answer;
     console.log('IP:');
     for (i in answer) {
-        console.log(answer[i].address);
+//        console.log(answer[i].address);
         ipList.push(answer[i].address);
     }
     return ipList;
