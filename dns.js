@@ -33,7 +33,7 @@ server.on('message', function (messageReq, remoteReq) {
                 client.on("message", function (messageRes, remoteRes) {
                     console.log('Receive: ' + remoteRes.address + ':' + remoteRes.port);
                     console.log('Length: ' + messageRes.length);
-                    bu.printBuffer(messageRes);
+//                    bu.printBuffer(messageRes);
                     //var fakeIp = getFakeIp(messageRes);
                     var ip = getIp(messageRes);
                     if (isFakeIp(ip, fakeIpList)) {
