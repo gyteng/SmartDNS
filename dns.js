@@ -18,11 +18,13 @@ server.on('listening', function () {
 
 
 server.on('message', function (messageReq, remoteReq) {
+
     console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
     console.log('Length: ' + messageReq.length);
 //    bu.printBuffer(messageReq);
+    console.log('id:' + packet.parse(messageReq).header.id);
     getDomain(messageReq);
-
+    var resLog = '';
     for(var i in DNS) {
         (function(i) {
             var client = dgram.createSocket('udp4');
@@ -34,7 +36,6 @@ server.on('message', function (messageReq, remoteReq) {
                     console.log('Receive: ' + remoteRes.address + ':' + remoteRes.port);
                     console.log('Length: ' + messageRes.length);
 //                    bu.printBuffer(messageRes);
-                    //var fakeIp = getFakeIp(messageRes);
                     var ip = getIp(messageRes);
                     if (isFakeIp(ip, fakeIpList)) {
                         console.log('Fake ip');
@@ -50,7 +51,6 @@ server.on('message', function (messageReq, remoteReq) {
             });
         })(i);
     }
-
 });
 
 
@@ -82,35 +82,6 @@ function getIp(buffer) {
     }
     console.log(ipList);
     return ipList;
-
-    /*
-    var ipList = [];
-    var ipAddress = '';
-    var offset = 12;
-    while(buffer[offset] != 0) {
-        offset += (buffer[offset] + 1);
-    }
-    if(offset + 5 >= buffer.length) {
-        return ipList;
-    }
-    if(buffer[offset + 5] != 192) {
-        offset += 5;
-        while(buffer[offset] != 0) {
-            offset += (buffer[offset] + 1);
-        }
-        offset -= 6;
-    }
-    offset += 17;
-    while(offset < buffer.length) {
-        ipAddress = '';
-        ipAddress += buffer[offset] + '.' + buffer[offset+1] + '.' + buffer[offset+2] + '.' + buffer[offset+3];
-        ipList.push(ipAddress);
-        offset += 16;
-    }
-    console.log(ipList);
-    return ipList;
-    */
-
 }
 
 server.bind(PORT, HOST);
