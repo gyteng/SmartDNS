@@ -20,7 +20,7 @@ server.on('listening', function () {
 server.on('message', function (messageReq, remoteReq) {
     console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
     console.log('Length: ' + messageReq.length);
-    bu.printBuffer(messageReq);
+//    bu.printBuffer(messageReq);
     getDomain(messageReq);
 
     for(var i in DNS) {
