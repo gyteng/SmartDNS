@@ -44,7 +44,6 @@ server.on('message', function (messageReq, remoteReq) {
                             if (err) throw err;
                             console.log('Message send to ' + remoteReq.address + ':' + remoteReq.port);
                             console.log('-------------------------------------------');
-
                         });
                     }
                 });
@@ -92,9 +91,9 @@ function getIp(buffer) {
     var answer = packet.parse(buffer).answer;
     console.log('IP:');
     for (i in answer) {
-        console.log(answer[i].address);
         ipList.push(answer[i].address);
     }
+    console.log(ipList);
     return ipList;
 
     /*
