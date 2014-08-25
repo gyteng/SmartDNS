@@ -56,22 +56,9 @@ server.on('message', function (messageReq, remoteReq) {
 
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
-    var domain = question.pop().name
+    var domain = question[0].name
     console.log('Domain: ' + domain);
     return domain;
-/*    var domain = '';
-    var offset = 12;
-    while(buffer[offset] != 0) {
-        for(var i = (offset + 1); i <= (offset + buffer[offset]); i++) {
-            domain += String.fromCharCode(buffer[i]);
-        }
-        domain += '.';
-        offset += (buffer[offset] + 1);
-    }
-    domain = domain.substring(0, domain.length - 1);
-    console.log('Domain: ' + domain);
-    return domain;
-    */
 }
 
 function isFakeIp(ip, list) {
