@@ -1,20 +1,70 @@
 var PORT = 53;
 var HOST = '0.0.0.0';
-var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8'];
+var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8', '208.67.222.222'];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var packet = require('native-dns-packet');
 var config = require('./config');
 var server = dgram.createSocket('udp4');
-var client = dgram.createSocket('udp4');
+//var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
+var async = require('async');
 
+server.bind(PORT, HOST);
 server.on('listening', function () {
     var address = server.address();
     console.log('-------------------------------------------');
     console.log('DNS Server listening on ' + address.address + ":" + address.port);
     console.log('-------------------------------------------');
 });
+/*
+server.on('message', function (message, remote) {
+    async_auto(message, remote.address, remote.port);
+});
+
+
+function async_auto(message, address, port) {
+    async.auto({
+            receiveMessage: function (callback, results) {
+                var client = dgram.createSocket('udp4');
+                callback(null, message, address, port, client);
+
+            },
+            sendToDNS: ['receiveMessage', function (callback, results) {
+                var message = results['receiveMessage'][0];
+                var client = results['receiveMessage'][3];
+                client.send(message, 0, message.length, 53, DNS[1], function (err, bytes) {
+                    callback(null);
+                });
+            }],
+            receiveFromDNS: ['sendToDNS', function (callback, results) {
+                var client = results['receiveMessage'][3];
+                client.on("message", function (message, remote) {
+                    if (isFakeIp(getIp(message), fakeIpList)) {
+                        console.log('fakeIp');
+                    } else {
+                        client.close();
+                        callback(null, message);
+                    }
+                });
+            }],
+            sendMessage: ['receiveFromDNS', function (callback, results) {
+                var message = results['receiveFromDNS'];
+                var port = results['receiveMessage'][2];
+                var address = results['receiveMessage'][1];
+                server.send(message, 0, message.length, port, address, function (err, bytes) {
+                    callback(null);
+                });
+
+            }]
+        }, function (err, results) {
+            //console.log('err = ', err);
+            //onsole.log('results = ', results);
+        }
+    );
+}
+*/
+
 
 
 server.on('message', function (messageReq, remoteReq) {
@@ -54,6 +104,7 @@ server.on('message', function (messageReq, remoteReq) {
 });
 
 
+
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
     var domain = question[0].name
@@ -83,6 +134,4 @@ function getIp(buffer) {
     console.log(ipList);
     return ipList;
 }
-
-server.bind(PORT, HOST);
 
