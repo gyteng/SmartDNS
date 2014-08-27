@@ -17,11 +17,17 @@ server.on('listening', function () {
     console.log('DNS Server listening on ' + address.address + ":" + address.port);
     console.log('-------------------------------------------');
 });
-/*
-server.on('message', function (message, remote) {
-    async_auto(message, remote.address, remote.port);
-});
 
+
+
+server.on('message', function (message, remote) {
+    queryDNSs(message, function(data){
+        server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
+
+        });
+    });
+});
+/*
 
 function async_auto(message, address, port) {
     async.auto({
@@ -66,7 +72,7 @@ function async_auto(message, address, port) {
 */
 
 
-
+/*
 server.on('message', function (messageReq, remoteReq) {
 
     console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
@@ -102,7 +108,7 @@ server.on('message', function (messageReq, remoteReq) {
         })(i);
     }
 });
-
+*/
 
 
 function getDomain(buffer) {
@@ -127,11 +133,70 @@ function isFakeIp(ip, list) {
 function getIp(buffer) {
     var ipList  = [];
     var answer = packet.parse(buffer).answer;
-    console.log('IP:');
+//    console.log('IP:');
     for (i in answer) {
         ipList.push(answer[i].address);
     }
-    console.log(ipList);
+//    console.log(ipList);
     return ipList;
 }
 
+function queryDNSs(message, cb) {
+    async.parallel([
+        function(callback) {
+            queryDNSwithUDP(message, '114.114.114.114', 53, function(data) {
+                return callback(null, data);
+            });
+        },
+        function(callback) {
+            queryDNSwithUDP(message, '8.8.8.8', 53, function(data) {
+                return callback(null, data);
+            });
+        }
+    ], function (err, results) {
+        for(i in results) {
+            if(results[i]) {
+                cb(results[i]);
+            }
+        }
+    });
+
+
+
+}
+
+function queryDNSwithUDP(message, address, port, cb) {
+    var client = dgram.createSocket('udp4');
+    async.series({
+            send: function (callback) {
+                client.send(message, 0, message.length, port, address, function (err, bytes) {
+                });
+                callback(null);
+            },
+            receive: function (callback) {
+                client.on("message", function (message, remote) {
+                    if(!isFakeIp(getIp(message), fakeIpList)) {
+                        client.close();
+                        callback(null, message);
+                    }
+                });
+                setTimeout(function () {
+                    try {
+                        callback(null, null);
+                    } catch (err) {
+
+                    }
+
+                }, 5000);
+            }
+        }, function (err, results) {
+            cb(results.receive);
+        }
+    );
+}
+
+function queryDNSwithTCP(message) {
+}
+
+function queryDNSwithProxy(message) {
+}
