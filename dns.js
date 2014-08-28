@@ -1,6 +1,10 @@
 var PORT = 53;
 var HOST = '0.0.0.0';
-var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8', '208.67.222.222'];
+//var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8', '208.67.222.222'];
+var DNS = [{ip:'202.96.128.86', port:53},
+    {ip:'114.114.114.114', port:53},
+    {ip:'8.8.8.8', port:53},
+    {ip:'208.67.222.222', port:53}];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var packet = require('native-dns-packet');
@@ -46,7 +50,7 @@ function async_auto(message, address, port) {
             receiveFromDNS: ['sendToDNS', function (callback, results) {
                 var client = results['receiveMessage'][3];
                 client.on("message", function (message, remote) {
-                    if (isFakeIp(getIp(message), fakeIpList)) {
+                    if (isFakeIp(getIpAddress(message), fakeIpList)) {
                         console.log('fakeIp');
                     } else {
                         client.close();
@@ -92,7 +96,7 @@ server.on('message', function (messageReq, remoteReq) {
                     console.log('Receive: ' + remoteRes.address + ':' + remoteRes.port);
                     console.log('Length: ' + messageRes.length);
 //                    bu.printBuffer(messageRes);
-                    var ip = getIp(messageRes);
+                    var ip = getIpAddress(messageRes);
                     if (isFakeIp(ip, fakeIpList)) {
                         console.log('Fake ip');
                         console.log('-------------------------------------------');
@@ -130,39 +134,53 @@ function isFakeIp(ip, list) {
     return false;
 }
 
-function getIp(buffer) {
+function getIpAddress(buffer) {
     var ipList  = [];
     var answer = packet.parse(buffer).answer;
-//    console.log('IP:');
     for (i in answer) {
         ipList.push(answer[i].address);
     }
-//    console.log(ipList);
     return ipList;
 }
 
+
 function queryDNSs(message, cb) {
-    async.parallel([
-        function(callback) {
-            queryDNSwithUDP(message, '114.114.114.114', 53, function(data) {
-                return callback(null, data);
-            });
-        },
-        function(callback) {
-            queryDNSwithUDP(message, '8.8.8.8', 53, function(data) {
-                return callback(null, data);
-            });
-        }
-    ], function (err, results) {
-        for(i in results) {
-            if(results[i]) {
+    async.map(DNS, function (item, callback) {
+        queryDNSwithUDP(message, item.ip, item.port, function (data) {
+            return callback(null, data);
+        });
+    }, function (err, results) {
+        console.log(results);
+        for (i in results) {
+            if (results[i]) {
                 cb(results[i]);
             }
         }
     });
-
-
-
+    /*    async.parallel([
+     function(callback) {
+     queryDNSwithUDP(message, '202.96.128.86', 53, function(data) {
+     return callback(null, data);
+     });
+     },
+     function(callback) {
+     queryDNSwithUDP(message, '114.114.114.114', 53, function(data) {
+     return callback(null, data);
+     });
+     },
+     function(callback) {
+     queryDNSwithUDP(message, '8.8.8.8', 53, function(data) {
+     return callback(null, data);
+     });
+     }
+     ], function (err, results) {
+     for(i in results) {
+     if(results[i]) {
+     cb(results[i]);
+     }
+     }
+     });
+     */
 }
 
 function queryDNSwithUDP(message, address, port, cb) {
@@ -175,7 +193,7 @@ function queryDNSwithUDP(message, address, port, cb) {
             },
             receive: function (callback) {
                 client.on("message", function (message, remote) {
-                    if(!isFakeIp(getIp(message), fakeIpList)) {
+                    if(!isFakeIp(getIpAddress(message), fakeIpList)) {
                         client.close();
                         callback(null, message);
                     }
@@ -186,7 +204,6 @@ function queryDNSwithUDP(message, address, port, cb) {
                     } catch (err) {
 
                     }
-
                 }, 5000);
             }
         }, function (err, results) {
