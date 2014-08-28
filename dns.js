@@ -30,13 +30,14 @@ server.on('listening', function () {
 server.on('message', function (message, remote) {
     queryDNSs(message, function(data){
         server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
-            var log = getDomain(data) + '\n';
-            var ip = getIpAddress(data);
-            for(i in ip) {
-                log += ip[i] + '\n'
-            }
-            log += '-------------------------------------------';
-            console.log(log);
+//            console.log(getDomain(data));
+//            var log = getDomain(data) + '\n';
+//            var ip = getIpAddress(data);
+//            for(i in ip) {
+//                log += ip[i] + '\n'
+//            }
+//            log += '-------------------------------------------';
+//            console.log(log);
         });
     });
 });
@@ -86,6 +87,7 @@ function queryDNSs(message, cb) {
         }
     }, function (results) {
 //        bu.printBuffer(dataCallback);
+        console.log(results.ip + ' ' + results.type + ' ' + getDomain(dataCallback));
         cb(dataCallback);
     });
 }
