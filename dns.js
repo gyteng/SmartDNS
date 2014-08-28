@@ -16,6 +16,7 @@ var net = require('net');
 //var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
 var async = require('async');
+var now = new Date();
 
 server.bind(PORT, HOST);
 server.on('listening', function () {
@@ -86,8 +87,11 @@ function queryDNSs(message, cb) {
             });
         }
     }, function (results) {
-//        bu.printBuffer(dataCallback);
-        console.log(results.ip + ' ' + results.type + ' ' + getDomain(dataCallback));
+        console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
+        console.log('From ' + results.ip + ' ' + results.type);
+        console.log(getDomain(dataCallback) + ' ->');
+        console.log(getIpAddress(dataCallback));
+        console.log('-------------------------------------------');
         cb(dataCallback);
     });
 }
