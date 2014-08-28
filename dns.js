@@ -85,7 +85,7 @@ function queryDNSs(message, cb) {
             });
         }
     }, function (results) {
-        bu.printBuffer(dataCallback);
+//        bu.printBuffer(dataCallback);
         cb(dataCallback);
     });
 }
