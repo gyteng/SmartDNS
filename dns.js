@@ -10,6 +10,7 @@ var bu = require('./BufferUtils');
 var packet = require('native-dns-packet');
 var config = require('./config');
 var server = dgram.createSocket('udp4');
+var net = require('net');
 //var client = dgram.createSocket('udp4');
 var fakeIpList = config.fakeIpList;
 var async = require('async');
@@ -27,93 +28,9 @@ server.on('listening', function () {
 server.on('message', function (message, remote) {
     queryDNSs(message, function(data){
         server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
-
         });
     });
 });
-/*
-
-function async_auto(message, address, port) {
-    async.auto({
-            receiveMessage: function (callback, results) {
-                var client = dgram.createSocket('udp4');
-                callback(null, message, address, port, client);
-
-            },
-            sendToDNS: ['receiveMessage', function (callback, results) {
-                var message = results['receiveMessage'][0];
-                var client = results['receiveMessage'][3];
-                client.send(message, 0, message.length, 53, DNS[1], function (err, bytes) {
-                    callback(null);
-                });
-            }],
-            receiveFromDNS: ['sendToDNS', function (callback, results) {
-                var client = results['receiveMessage'][3];
-                client.on("message", function (message, remote) {
-                    if (isFakeIp(getIpAddress(message), fakeIpList)) {
-                        console.log('fakeIp');
-                    } else {
-                        client.close();
-                        callback(null, message);
-                    }
-                });
-            }],
-            sendMessage: ['receiveFromDNS', function (callback, results) {
-                var message = results['receiveFromDNS'];
-                var port = results['receiveMessage'][2];
-                var address = results['receiveMessage'][1];
-                server.send(message, 0, message.length, port, address, function (err, bytes) {
-                    callback(null);
-                });
-
-            }]
-        }, function (err, results) {
-            //console.log('err = ', err);
-            //onsole.log('results = ', results);
-        }
-    );
-}
-*/
-
-
-/*
-server.on('message', function (messageReq, remoteReq) {
-
-    console.log('Receive: ' + remoteReq.address + ':' + remoteReq.port);
-    console.log('Length: ' + messageReq.length);
-//    bu.printBuffer(messageReq);
-    console.log('id:' + packet.parse(messageReq).header.id);
-    getDomain(messageReq);
-    var resLog = '';
-    for(var i in DNS) {
-        (function(i) {
-            var client = dgram.createSocket('udp4');
-            client.send(messageReq, 0, messageReq.length, 53, DNS[i], function (err, bytes) {
-                if (err) throw err;
-                console.log('Message send to ' + DNS[i] + ':' + 53);
-                console.log('-------------------------------------------');
-                client.on("message", function (messageRes, remoteRes) {
-                    console.log('Receive: ' + remoteRes.address + ':' + remoteRes.port);
-                    console.log('Length: ' + messageRes.length);
-//                    bu.printBuffer(messageRes);
-                    var ip = getIpAddress(messageRes);
-                    if (isFakeIp(ip, fakeIpList)) {
-                        console.log('Fake ip');
-                        console.log('-------------------------------------------');
-                    } else {
-                        server.send(messageRes, 0, messageRes.length, remoteReq.port, remoteReq.address, function (err, bytes) {
-                            if (err) throw err;
-                            console.log('Message send to ' + remoteReq.address + ':' + remoteReq.port);
-                            console.log('-------------------------------------------');
-                        });
-                    }
-                });
-            });
-        })(i);
-    }
-});
-*/
-
 
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
@@ -147,10 +64,11 @@ function getIpAddress(buffer) {
 function queryDNSs(message, cb) {
     async.map(DNS, function (item, callback) {
         queryDNSwithUDP(message, item.ip, item.port, function (data) {
+            console.log(data);
             return callback(null, data);
         });
     }, function (err, results) {
-        console.log(results);
+        //console.log(results);
         for (i in results) {
             if (results[i]) {
                 cb(results[i]);
@@ -188,7 +106,22 @@ function queryDNSwithUDP(message, address, port, cb) {
     );
 }
 
-function queryDNSwithTCP(message) {
+function queryDNSwithTCP(message, address, port, cb) {
+    var client = new net.Socket();
+    var messageTcp = new Buffer(message.length + 2);
+    messageTcp[0] = 0x00;
+    messageTcp[1] = message.length;
+    message.copy(messageTcp, 2, 0, messageTcp.length);
+    client.connect(port, address, function() {
+        client.write(messageTcp);
+    });
+    client.on('data', function(dataTcp) {
+        var length = parseInt(dataTcp[1].toString(10));
+        var data = new Buffer(length);
+        dataTcp.copy(data, 0, 2, length + 2);
+        cb(data);
+        client.destroy();
+    });
 }
 
 function queryDNSwithProxy(message) {
