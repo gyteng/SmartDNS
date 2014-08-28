@@ -1,10 +1,12 @@
 var PORT = 53;
 var HOST = '0.0.0.0';
 //var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8', '208.67.222.222'];
-var DNS = [{ip:'202.96.128.86', port:53},
-    {ip:'114.114.114.114', port:53},
-    {ip:'8.8.8.8', port:53},
-    {ip:'208.67.222.222', port:53}];
+var DNS = [
+    {ip:'202.96.128.86', port:53, type:'UDP'},
+    {ip:'114.114.114.114', port:53, type:'UDP'},
+    {ip:'8.8.8.8', port:53, type:'UDP'},
+    {ip:'208.67.222.222', port:53, type:'TCP'}
+];
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var packet = require('native-dns-packet');
@@ -28,6 +30,13 @@ server.on('listening', function () {
 server.on('message', function (message, remote) {
     queryDNSs(message, function(data){
         server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
+            var log = getDomain(data) + '\n';
+            var ip = getIpAddress(data);
+            for(i in ip) {
+                log += ip[i] + '\n'
+            }
+            log += '-------------------------------------------';
+            console.log(log);
         });
     });
 });
@@ -35,7 +44,7 @@ server.on('message', function (message, remote) {
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
     var domain = question[0].name
-    console.log('Domain: ' + domain);
+//    console.log('Domain: ' + domain);
     return domain;
 }
 
@@ -62,18 +71,22 @@ function getIpAddress(buffer) {
 
 
 function queryDNSs(message, cb) {
-    async.map(DNS, function (item, callback) {
-        queryDNSwithUDP(message, item.ip, item.port, function (data) {
-            console.log(data);
-            return callback(null, data);
-        });
-    }, function (err, results) {
-        //console.log(results);
-        for (i in results) {
-            if (results[i]) {
-                cb(results[i]);
-            }
+    var dataCallback;
+    async.detect(DNS, function (item, callback) {
+        if(item.type == 'UDP') {
+            queryDNSwithUDP(message, item.ip, item.port, function (data) {
+                dataCallback = data;
+                callback(data);
+            });
+        } else if (item.type == 'TCP') {
+            queryDNSwithTCP(message, item.ip, item.port, function (data) {
+                dataCallback = data;
+                callback(data);
+            });
         }
+    }, function (results) {
+        bu.printBuffer(dataCallback);
+        cb(dataCallback);
     });
 }
 
@@ -92,13 +105,17 @@ function queryDNSwithUDP(message, address, port, cb) {
                         callback(null, message);
                     }
                 });
-                setTimeout(function () {
-                    try {
-                        callback(null, null);
-                    } catch (err) {
+                client.on("error", function (err) {
 
-                    }
-                }, 5000);
+                });
+//                setTimeout(function () {
+//                    try {
+//                        client.close();
+//                        callback(null, null);
+//                    } catch (err) {
+//
+//                    }
+//                }, 2000);
             }
         }, function (err, results) {
             cb(results.receive);
@@ -109,18 +126,27 @@ function queryDNSwithUDP(message, address, port, cb) {
 function queryDNSwithTCP(message, address, port, cb) {
     var client = new net.Socket();
     var messageTcp = new Buffer(message.length + 2);
-    messageTcp[0] = 0x00;
-    messageTcp[1] = message.length;
+    messageTcp[0] = message.length / 256;
+    messageTcp[1] = message.length % 256;
     message.copy(messageTcp, 2, 0, messageTcp.length);
     client.connect(port, address, function() {
         client.write(messageTcp);
     });
-    client.on('data', function(dataTcp) {
-        var length = parseInt(dataTcp[1].toString(10));
+    client.on('data', function (dataTcp) {
+        var length = parseInt(dataTcp[1].toString(10) + dataTcp[0].toString(10) * 256);
         var data = new Buffer(length);
         dataTcp.copy(data, 0, 2, length + 2);
         cb(data);
-        client.destroy();
+//        setTimeout(function () {
+//            try {
+//                cb(null);
+//            } catch (err) {
+//
+//            }
+//        }, 2000);
+    });
+    client.on('error', function (err) {
+
     });
 }
 
