@@ -157,30 +157,6 @@ function queryDNSs(message, cb) {
             }
         }
     });
-    /*    async.parallel([
-     function(callback) {
-     queryDNSwithUDP(message, '202.96.128.86', 53, function(data) {
-     return callback(null, data);
-     });
-     },
-     function(callback) {
-     queryDNSwithUDP(message, '114.114.114.114', 53, function(data) {
-     return callback(null, data);
-     });
-     },
-     function(callback) {
-     queryDNSwithUDP(message, '8.8.8.8', 53, function(data) {
-     return callback(null, data);
-     });
-     }
-     ], function (err, results) {
-     for(i in results) {
-     if(results[i]) {
-     cb(results[i]);
-     }
-     }
-     });
-     */
 }
 
 function queryDNSwithUDP(message, address, port, cb) {
