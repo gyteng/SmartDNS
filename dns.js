@@ -67,20 +67,20 @@ function getIpAddress(buffer) {
 function queryDNSs(message, cb) {
     var dataCallback;
     async.detect(DNS, function (item, callback) {
-        if(item.type == 'UDP') {
-            queryDNSwithUDP(message, item.ip, item.port, function (data) {
+        if(item.type == 'UDP' || (!item.type)) {
+            queryDNSwithUDP(message, item.ip, (item.port ? item.port : 53), function (data) {
                 dataCallback = data;
                 callback(data);
             });
         } else if (item.type == 'TCP') {
-            queryDNSwithTCP(message, item.ip, item.port, function (data) {
+            queryDNSwithTCP(message, item.ip, (item.port ? item.port : 53), function (data) {
                 dataCallback = data;
                 callback(data);
             });
         }
     }, function (results) {
         console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
-        console.log('From ' + results.ip + ' ' + results.type);
+        console.log('From ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
         console.log(getIpAddress(dataCallback));
         console.log('-------------------------------------------');
