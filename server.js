@@ -41,8 +41,6 @@ exports.startup = function(configFile) {
     });
 }
 
-
-
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
     var domain = question[0].name
