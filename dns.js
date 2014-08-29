@@ -1,19 +1,13 @@
-var PORT = 53;
-var HOST = '0.0.0.0';
-//var DNS = ['202.96.128.86', '114.114.114.114', '8.8.8.8', '208.67.222.222'];
-var DNS = [
-    {ip:'202.96.128.86', port:53, type:'UDP'},
-    {ip:'114.114.114.114', port:53, type:'UDP'},
-    {ip:'8.8.8.8', port:53, type:'UDP'},
-    {ip:'208.67.222.222', port:53, type:'TCP'}
-];
+var config = require('./config.json');
+var HOST = config.listen.host;
+var PORT = config.listen.port;
+var DNS = config.dns;
+var fakeIpList = config.fakeIpList;
 var dgram = require('dgram');
 var bu = require('./BufferUtils');
 var packet = require('native-dns-packet');
-var config = require('./config.json');
 var server = dgram.createSocket('udp4');
 var net = require('net');
-var fakeIpList = config.fakeIpList;
 var async = require('async');
 var now = new Date();
 
@@ -24,7 +18,6 @@ server.on('listening', function () {
     console.log('DNS Server listening on ' + address.address + ":" + address.port);
     console.log('-------------------------------------------');
 });
-
 
 
 server.on('message', function (message, remote) {
