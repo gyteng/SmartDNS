@@ -1,0 +1,27 @@
+{
+  "name": "smartdns",
+  "version": "0.1.0",
+  "description": "A local DNS server for crossing the GFW.",
+  "main": "dns.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gyteng/SmartDNS.git"
+  },
+  "keywords": [
+    "dns"
+  ],
+  "author": "Gyteng",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gyteng/SmartDNS/issues"
+  },
+  "homepage": "https://github.com/gyteng/SmartDNS",
+  "dependencies": {
+    "native-dns-packet" : "0.0.4",
+    "async" : "0.9.0"
+  },
+  "bin": "./bin/smartdns"
+}
