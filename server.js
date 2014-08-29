@@ -1,8 +1,4 @@
-var config = require('./config.json');
-var HOST = config.listen.host;
-var PORT = config.listen.port;
-var DNS = config.dns;
-var fakeIpList = config.fakeIpList;
+var config;
 var dgram = require('dgram');
 var bu = require('./lib/BufferUtils');
 var packet = require('native-dns-packet');
@@ -10,22 +6,42 @@ var server = dgram.createSocket('udp4');
 var net = require('net');
 var async = require('async');
 var now = new Date();
+var HOST;
+var PORT;
+var DNS;
+var fakeIpList;
 
-server.bind(PORT, HOST);
-server.on('listening', function () {
-    var address = server.address();
-    console.log('-------------------------------------------');
-    console.log('DNS Server listening on ' + address.address + ":" + address.port);
-    console.log('-------------------------------------------');
-});
+exports.startup = function(configFile) {
 
-server.on('message', function (message, remote) {
-    queryDNSs(message, function(data){
-        server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
+    if(!configFile) {
+        var config = require('./config.json');
+    } else {
+        var config = configFile;
+    }
+    HOST = config.listen.host;
+    PORT = config.listen.port;
+    DNS = config.dns;
+    fakeIpList = config.fakeIpList;
 
+
+    server.bind(PORT, HOST);
+    server.on('listening', function () {
+        var address = server.address();
+        console.log('-------------------------------------------');
+        console.log('DNS Server listening on ' + address.address + ":" + address.port);
+        console.log('-------------------------------------------');
+    });
+
+    server.on('message', function (message, remote) {
+        queryDNSs(message, function(data){
+            server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
+
+            });
         });
     });
-});
+}
+
+
 
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
