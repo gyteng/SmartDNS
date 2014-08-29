@@ -5,9 +5,8 @@ smartDNS
 
 使用
 ----
-npm install native-dns-packet  
-npm install async  
-sudo node server.js
+npm -g install smartdns  
+sudo smartdns
 
 TODO:  
 -----
