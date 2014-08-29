@@ -19,18 +19,10 @@ server.on('listening', function () {
     console.log('-------------------------------------------');
 });
 
-
 server.on('message', function (message, remote) {
     queryDNSs(message, function(data){
         server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
-//            console.log(getDomain(data));
-//            var log = getDomain(data) + '\n';
-//            var ip = getIpAddress(data);
-//            for(i in ip) {
-//                log += ip[i] + '\n'
-//            }
-//            log += '-------------------------------------------';
-//            console.log(log);
+
         });
     });
 });
@@ -38,7 +30,6 @@ server.on('message', function (message, remote) {
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
     var domain = question[0].name
-//    console.log('Domain: ' + domain);
     return domain;
 }
 
@@ -63,7 +54,6 @@ function getIpAddress(buffer) {
     return ipList;
 }
 
-
 function queryDNSs(message, cb) {
     var dataCallback;
     async.detect(DNS, function (item, callback) {
@@ -82,7 +72,9 @@ function queryDNSs(message, cb) {
         console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
         console.log('From ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
-        console.log(getIpAddress(dataCallback));
+        for(i in getIpAddress(dataCallback)) {
+            console.log('     ' + getIpAddress(dataCallback)[i]);
+        }
         console.log('-------------------------------------------');
         cb(dataCallback);
     });
