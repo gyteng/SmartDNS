@@ -72,9 +72,7 @@ function queryDNSs(message, cb) {
         console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
         console.log('From ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
-        for(i in getIpAddress(dataCallback)) {
-            console.log('     ' + getIpAddress(dataCallback)[i]);
-        }
+        console.log(getIpAddress(dataCallback));
         console.log('-------------------------------------------');
         cb(dataCallback);
     });
