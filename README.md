@@ -7,7 +7,7 @@ smartDNS
 ----
 npm install native-dns-packet  
 npm install async  
-sudo node dns.js
+sudo node server.js
 
 TODO:  
 -----
