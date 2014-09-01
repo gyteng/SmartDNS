@@ -16,4 +16,3 @@ if(!process.argv[2]) {
 } else {
     console.log('Please use "--help" or "-h" to show manual.');
 }
-
