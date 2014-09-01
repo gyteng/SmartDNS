@@ -7,7 +7,7 @@ var server = require(lib + '/server');
 if(!process.argv[2]) {
     server.startup();
 } else if(process.argv[2] == '--help' || process.argv[2] == '-h') {
-    console.log('SmartDNS 0.1.7');
+    console.log('SmartDNS 0.1.9');
     console.log('sudo smartdns -c "/path/to/config/file"');
 } else if(process.argv[2] == '--config' || process.argv[2] == '-c') {
     var config = require(process.argv[3]);
@@ -15,4 +15,3 @@ if(!process.argv[2]) {
 } else {
     console.log('Please use "--help" or "-h" to show manual.');
 }
-

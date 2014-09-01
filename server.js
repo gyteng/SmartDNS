@@ -5,6 +5,7 @@ var packet = require('native-dns-packet');
 var server = dgram.createSocket('udp4');
 var net = require('net');
 var async = require('async');
+var now = new Date();
 var HOST;
 var PORT;
 var DNS;
@@ -82,7 +83,6 @@ function queryDNSs(message, cb) {
             });
         }
     }, function (results) {
-        var now = new Date();
         console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
         console.log('From ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
