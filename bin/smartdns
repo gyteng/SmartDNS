@@ -7,7 +7,7 @@ var server = require(lib + '/server');
 if(!process.argv[2]) {
     server.startup();
 } else if(process.argv[2] == '--help' || process.argv[2] == '-h') {
-    console.log('SmartDNS 0.1.4');
+    console.log('SmartDNS 0.1.5');
     console.log('smartdns -c "/path/to/config/file"');
     console.log('If the listening port is smaller than 1000, you might use "sudo" before it.');
 } else if(process.argv[2] == '--config' || process.argv[2] == '-c') {
