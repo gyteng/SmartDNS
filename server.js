@@ -32,6 +32,7 @@ exports.startup = function(configFile) {
     });
 
     server.on('message', function (message, remote) {
+        console.log('Req from ' + remote.address + ':' + remote.address);
         queryDNSs(message, function(data){
             server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
 
@@ -84,7 +85,7 @@ function queryDNSs(message, cb) {
     }, function (results) {
         var now = new Date();
         console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
-        console.log('From ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
+        console.log('Res from ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
         console.log(getIpAddress(dataCallback));
         console.log('-------------------------------------------');
