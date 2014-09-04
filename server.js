@@ -9,6 +9,7 @@ var HOST;
 var PORT;
 var DNS;
 var fakeIpList;
+var log = require('./lib/log').logger;
 
 exports.startup = function(configFile) {
 
@@ -33,6 +34,7 @@ exports.startup = function(configFile) {
 
     server.on('message', function (message, remote) {
         queryDNSs(message, function(data){
+            console.log('Req from: ' + remote.address + ':' + remote.port);
             server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
 
             });
@@ -153,4 +155,5 @@ function queryDNSwithTCP(message, address, port, cb) {
 }
 
 function queryDNSwithProxy(message) {
+
 }
