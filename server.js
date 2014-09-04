@@ -13,9 +13,9 @@ var fakeIpList;
 exports.startup = function(configFile) {
 
     if(!configFile) {
-        var config = require('./config.json');
+        config = require('./config.json');
     } else {
-        var config = configFile;
+        config = configFile;
     }
     HOST = config.listen.host;
     PORT = config.listen.port;
@@ -32,19 +32,17 @@ exports.startup = function(configFile) {
     });
 
     server.on('message', function (message, remote) {
-        console.log('Res from: ' + remote.address + ':' + remote.port);
         queryDNSs(message, function(data){
             server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
 
             });
         });
     });
-}
+};
 
 function getDomain(buffer) {
     var question = packet.parse(buffer).question;
-    var domain = question[0].name
-    return domain;
+    return question[0].name;
 }
 
 function isFakeIp(ip, list) {
@@ -83,14 +81,13 @@ function queryDNSs(message, cb) {
             });
         }
     }, function (results) {
-        //var now = new Date();
-        //console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
+        var now = new Date();
+        console.log(now.toLocaleDateString() + ' ' + now.toLocaleTimeString());
         console.log('Res from ' + results.ip + ' ' + (results.type ? results.type : 'UDP'));
         console.log(getDomain(dataCallback) + ' ->');
-        getIpAddress(dataCallback).forEach(function(name) {
-            console.log(name);
+        getIpAddress(dataCallback).forEach(function(ip) {
+            console.log('    ' + ip);
         });
-        //console.log(getIpAddress(dataCallback));
         console.log('-------------------------------------------');
         cb(dataCallback);
     });
