@@ -33,8 +33,8 @@ exports.startup = function(configFile) {
     });
 
     server.on('message', function (message, remote) {
+        console.log('Req from: ' + remote.address + ':' + remote.port);
         queryDNSs(message, function(data){
-            console.log('Req from: ' + remote.address + ':' + remote.port);
             server.send(data, 0, data.length, remote.port, remote.address, function (err, bytes) {
 
             });
