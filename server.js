@@ -60,9 +60,9 @@ function isFakeIp(ip, list) {
 function getIpAddress(buffer) {
     var ipList  = [];
     var answer = packet.parse(buffer).answer;
-    for (i in answer) {
-        ipList.push(answer[i].address);
-    }
+    answer.forEach(function(ans){
+        ipList.push(ans.address);
+    });
     return ipList;
 }
 
