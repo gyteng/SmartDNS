@@ -9,11 +9,15 @@ if(!process.argv[2]) {
     server.startup();
 } else if(process.argv[2] == '--help' || process.argv[2] == '-h') {
     console.log('SmartDNS ' + ver.version);
-    console.log('sudo smartdns -c "/path/to/config/file"');
+    console.log('Usage: smartdns [options]...');
+    console.log('');
+    console.log('Options:');
+    console.log('  -c, --config       use a custom config file');
+    console.log('  -h, --help         show this message');
 } else if(process.argv[2] == '--config' || process.argv[2] == '-c') {
     var config = require(process.argv[3]);
     server.startup(config);
 } else {
-    console.log('Unknown command "' + process.argv[2] + '",');
+    console.log('Unknown option "' + process.argv[2] + '",');
     console.log('Please use "--help" or "-h" to show manual.');
 }

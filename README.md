@@ -8,6 +8,8 @@ smartDNS
 npm -g install smartdns  
 sudo smartdns
 
+[配置文件示例](https://github.com/gyteng/SmartDNS/blob/master/config.json)
+
 TODO:  
 -----
 * 增加采用代理方式查询
