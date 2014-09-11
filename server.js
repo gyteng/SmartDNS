@@ -61,7 +61,9 @@ function getIpAddress(buffer) {
     var ipList  = [];
     var answer = packet.parse(buffer).answer;
     answer.forEach(function(ans){
-        ipList.push(ans.address);
+        if(ans.address) {
+            ipList.push(ans.address);
+        }
     });
     return ipList;
 }
@@ -111,14 +113,6 @@ function queryDNSwithUDP(message, address, port, cb) {
                 client.on("error", function (err) {
 
                 });
-//                setTimeout(function () {
-//                    try {
-//                        client.close();
-//                        callback(null, null);
-//                    } catch (err) {
-//
-//                    }
-//                }, 2000);
             }
         }, function (err, results) {
             cb(results.receive);
@@ -140,13 +134,6 @@ function queryDNSwithTCP(message, address, port, cb) {
         var data = new Buffer(length);
         dataTcp.copy(data, 0, 2, length + 2);
         cb(data);
-//        setTimeout(function () {
-//            try {
-//                cb(null);
-//            } catch (err) {
-//
-//            }
-//        }, 2000);
     });
     client.on('error', function (err) {
 
