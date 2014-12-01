@@ -9,8 +9,8 @@ var HOST;
 var PORT;
 var DNS;
 var fakeIpList;
-var log4js = require("log4js");
-var logger = log4js.getLogger();
+// var log4js = require("log4js");
+// var logger = log4js.getLogger();
 
 exports.startup = function(configFile) {
 
