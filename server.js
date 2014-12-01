@@ -9,6 +9,8 @@ var HOST;
 var PORT;
 var DNS;
 var fakeIpList;
+var log4js = require("log4js");
+var logger = log4js.getLogger();
 
 exports.startup = function(configFile) {
 
@@ -46,11 +48,11 @@ function getDomain(buffer) {
 }
 
 function isFakeIp(ip, list) {
-    if(ip.length == 0) {
+    if(ip.length === 0) {
         return true;
     }
     for(var i in list) {
-        if(ip[0] == list[i]) {
+        if(ip[0] === list[i]) {
             return true;
         }
     }
@@ -130,7 +132,7 @@ function queryDNSwithTCP(message, address, port, cb) {
         client.write(messageTcp);
     });
     client.on('data', function (dataTcp) {
-        var length = parseInt(dataTcp[1].toString(10) + dataTcp[0].toString(10) * 256);
+        var length = parseInt(dataTcp[1].toString(10) + dataTcp[0].toString(10) * 256, 10);
         var data = new Buffer(length);
         dataTcp.copy(data, 0, 2, length + 2);
         cb(data);
@@ -140,5 +142,6 @@ function queryDNSwithTCP(message, address, port, cb) {
     });
 }
 
-function queryDNSwithProxy(message) {
+function queryDNSwithProxy(message, address, port, cb) {
+
 }
