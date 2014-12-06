@@ -24,6 +24,22 @@ exports.startup = function(configFile) {
     DNS = config.dns;
     fakeIpList = config.fakeIpList;
 
+    var express = require('express');
+    var app = express();
+
+    app.get('/', function(req, res) {
+        res.send('Hello World!');
+    });
+
+    var expressServer = app.listen(1933, function() {
+
+        var host = expressServer.address().address;
+        var port = expressServer.address().port;
+
+        console.log('Example app listening at http://%s:%s', host, port);
+
+    });
+
 
     server.bind(PORT, HOST);
     server.on('listening', function () {
@@ -140,8 +156,4 @@ function queryDNSwithTCP(message, address, port, cb) {
     client.on('error', function (err) {
 
     });
-}
-
-function queryDNSwithProxy(message, address, port, cb) {
-
 }
